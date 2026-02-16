@@ -59,9 +59,9 @@ print("画像を生成しています...")
 wc = WordCloud(
     background_color="white",
     font_path=FONT_PATH,
-    mask=mask_array,            # 型抜き指定
-    contour_width=1,            # 輪郭線の太さ
-    contour_color='steelblue',  # 輪郭線の色
+    mask=mask_array,
+    contour_width=0,            # ←【修正】ここを「0」にするだけだ！
+    # contour_color='steelblue', # ← 太さが0なら色指定も意味がないのでコメントアウトして良い
     colormap="viridis",         # 色使い
     stopwords=set(STOP_WORDS)
 )
