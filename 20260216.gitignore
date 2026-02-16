@@ -1,0 +1,15 @@
+# 仮想環境（ゴミ）
+.venv/
+__pycache__/
+
+# 素材データ（著作権・ライセンス配慮）
+font/
+input/
+output/
+
+# ただし、mask.png（自作/フリー素材）だけは許可したいならこう書く
+!input/mask.png
+
+# OSのゴミファイル
+.DS_Store
+Thumbs.db
