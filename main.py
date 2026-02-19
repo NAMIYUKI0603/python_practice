@@ -74,7 +74,7 @@ wc = WordCloud(
     contour_width=0,
     colormap="viridis",
     # ▼▼▼【追加】ここがポイントだ▼▼▼
-    scale=4,  # デフォルトは1。ここを3や4にすると超高画質になる
+    scale=5,  # デフォルトは1。ここを3や4にすると超高画質になる
     # ▲▲▲ここまで▲▲▲
     stopwords=set(STOP_WORDS)
 )
