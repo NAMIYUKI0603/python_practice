@@ -9,7 +9,7 @@ import re
 # --- 設定エリア ---
 TEXT_FILE = "input/input.txt"
 FONT_PATH = "font/BIZ-UDGothicR.ttc" # ★要確認
-OUTPUT_IMAGE = "output/topic_model_5.png"
+OUTPUT_IMAGE = "output/topic_model_5_kankyouR7.png"
 NUM_TOPICS = 5  # 文書をいくつに分類するか（5つくらいが丁度いい）
 
 # --- ストップワード（前回の強力版） ---
