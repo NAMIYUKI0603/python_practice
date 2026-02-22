@@ -25,19 +25,8 @@ STOP_WORDS = [
     "それら", "状況", "傾向", "影響", "水準", "程度", "重要", "課題", "問題", 
     "事項", "項目", "内容", "結果", "成果", "側面", "背景", "要因", "分野", "領域",
     "的", "化", "性", "間", "前", "後", "上", "中", "下", "場合", "必要",
-    "医療", "労働", "制度", "労働者", "事業" "社会", "平成", "厚生"# ←厚労白書特有の当たり前すぎる言葉を追加
+    "医療", "労働", "制度", "労働者", "事業", "社会", "平成", "厚生"# ←厚労白書特有の当たり前すぎる言葉を追加
 ]
-
-def tokenize_and_filter(text):
-    t = Tokenizer()
-    words = []
-    for token in t.tokenize(text):
-        word = token.surface
-        part = token.part_of_speech.split(',')[0]
-        # ストップワードに含まれていないかチェックを追加
-        if part == '名詞' and len(word) > 1 and not re.match(r'^[0-9]+$', word) and word not in STOP_WORDS:
-            words.append(word)
-    return " ".join(words)
 
 # --- 1. 設定エリア ---
 FILE_PART1 = "input/kourou_R7_part1.txt"
@@ -65,18 +54,19 @@ if not os.path.exists("output"):
 print("--- システム事前チェック完了 ---\n")
 
 # --- 3. メイン処理 ---
-font_manager.fontManager.addfont(FONT_PATH)
-plt.rcParams['font.family'] = font_manager.FontProperties(fname=FONT_PATH).get_name()
-
 def tokenize_and_filter(text):
     t = Tokenizer()
     words = []
     for token in t.tokenize(text):
         word = token.surface
         part = token.part_of_speech.split(',')[0]
-        if part == '名詞' and len(word) > 1 and not re.match(r'^[0-9]+$', word):
+        # ストップワードに含まれていないかチェックを追加
+        if part == '名詞' and len(word) > 1 and not re.match(r'^[0-9]+$', word) and word not in STOP_WORDS:
             words.append(word)
     return " ".join(words)
+
+font_manager.fontManager.addfont(FONT_PATH)
+plt.rcParams['font.family'] = font_manager.FontProperties(fname=FONT_PATH).get_name()
 
 print("テキストを読み込み、形態素解析を実行中...（時間がかかる）")
 with open(FILE_PART1, 'r', encoding='utf-8') as f:
