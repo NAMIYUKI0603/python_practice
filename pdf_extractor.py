@@ -2,8 +2,8 @@ import pdfplumber
 import os
 
 # --- 設定エリア ---
-INPUT_PDF = "input/厚生労働白書R7.pdf"  # 読み込む白書のPDF
-OUTPUT_TXT = "input/kourou_R7_text.txt"    # 出力するテキストファイル
+INPUT_PDF = "input/厚生労働白書R6.pdf"  # 読み込む白書のPDF
+OUTPUT_TXT = "input/kourou_R6_text.txt"    # 出力するテキストファイル
 
 print(f"[{INPUT_PDF}] のテキスト抽出を開始します...")
 
