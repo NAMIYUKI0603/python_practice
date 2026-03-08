@@ -7,14 +7,25 @@ from janome.tokenizer import Tokenizer
 import collections
 from matplotlib import font_manager
 import re
+from datetime import datetime  # ★新たに追加（時間を取得する歯車）
 
 # --- 1. 空間設計（ディレクトリと経路） ---
-INPUT_TEXT = "input/kourou_R7_part1.txt"  # 分析対象のテキスト（適宜書き換えろ）
-STOPWORDS_DIR = "stopwords"               # ★ストップワードのテキスト群を入れる専用フォルダ
-FONT_PATH = "font/BIZ-UDGothicR.ttc"      # フォントパス
-OUTPUT_WC = "output/wordcloud.png"        # ワードクラウド画像
-OUTPUT_CHART = "output/top50_words.png"   # トップ50棒グラフ画像
-OUTPUT_CSV = "output/top50_words.csv"     # トップ50頻度表（Excel確認用）
+# ★注意：今は防災白書を分析しているはずなので、ファイル名を確認しろ
+INPUT_TEXT = "input/R7_part1.txt"  
+STOPWORDS_DIR = "stopwords"               
+FONT_PATH = "font/BIZ-UDGothicR.ttc"      
+
+# --- ★ロット番号（タイムスタンプ）の自動生成機構 ---
+# 現在時刻を取得（例：20260308_1605）
+timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+
+# 入力ファイル名から拡張子を削った「名前」だけを抽出（例：bousai_R7_part1）
+base_name = os.path.splitext(os.path.basename(INPUT_TEXT))[0]
+
+# 動的に出力ファイル名を生成（名前＋タイムスタンプ）
+OUTPUT_WC = f"output/wordcloud_{base_name}_{timestamp}.png"
+OUTPUT_CHART = f"output/top50_{base_name}_{timestamp}.png"
+OUTPUT_CSV = f"output/top50_{base_name}_{timestamp}.csv"
 
 # 必要な空間（フォルダ）がなければ自動生成する
 for d in ["input", "output", STOPWORDS_DIR, "font"]:
