@@ -4,11 +4,11 @@ import re
 
 # --- 1. 空間設計（顕微鏡の設定） ---
 # ★調べたい単語（ターゲット）をここに記述
-TARGET_WORD = "予算"  # 例：「予算」「火山」「避難」などに書き換える
+TARGET_WORD = "事業"  # 例：「予算」「火山」「避難」などに書き換える
 
 # ★対象とする年度のテキストファイルを指定
 # （7年分一気に調べたい場合は input/bousai_*_part1.txt にする）
-INPUT_FILES = "input/bousai_R1_part1.txt" 
+INPUT_FILES = "input/bousai_R7_part1.txt" 
 OUTPUT_FILE = f"output/targeting_{TARGET_WORD}_context.txt"
 
 # --- 2. 抽出機構（KWIC：Keyword in Context） ---
