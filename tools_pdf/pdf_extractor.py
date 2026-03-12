@@ -2,8 +2,8 @@ import pdfplumber
 import os
 
 # --- 設定エリア ---
-INPUT_PDF = "input/bousair6.pdf"  # 読み込む白書のPDF
-OUTPUT_TXT = "input/bousai_R6_text.txt"    # 出力するテキストファイル
+INPUT_PDF = "input/職場のあんぜんサイト：化学物質：　酸化アルミニウム.pdf"  # 読み込む白書のPDF
+OUTPUT_TXT = "input/職場のあんぜんサイト：化学物質：　酸化アルミニウム.txt"    # 出力するテキストファイル
 
 print(f"[{INPUT_PDF}] のテキスト抽出を開始します...")
 
