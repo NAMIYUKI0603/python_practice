@@ -92,7 +92,7 @@ nx.draw_networkx_edges(G, pos, width=edge_widths, edge_color=edge_colors, edge_c
 # ラベル描画時にも明示的に MS Gothic を指定する
 nx.draw_networkx_labels(G, pos, font_family='MS Gothic', font_size=13, font_weight='bold')
 
-plt.title("【一般動力機械】労働災害の共起ネットワーク（死のルート可視化・改善版）", fontsize=18)
+plt.title("【一般動力機械】労働災害の共起ネットワーク", fontsize=18)
 plt.axis('off')
 
 output_img = os.path.join(OUTPUT_DIR, "network_machinery_improved.png")
