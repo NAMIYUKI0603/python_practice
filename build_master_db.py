@@ -13,7 +13,7 @@ OUTPUT_DIR = "output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 TARGET_FILES = glob.glob(os.path.join(INPUT_DIR, "sisyou_db_*.xls*"))
-OUTPUT_CSV = os.path.join(OUTPUT_DIR, "master_sisyou_manufacturing_detailed.csv") # 出力ファイル名を変更
+OUTPUT_CSV = os.path.join(OUTPUT_DIR, "master_sisyou_貨物取扱業_detailed.csv") # 出力ファイル名を変更
 
 print(f"--- 第1工程：労災データベース（詳細分類追加版）の統合を開始 ---")
 print(f"発見されたパレット（ファイル）数: {len(TARGET_FILES)}件\n")
@@ -34,7 +34,7 @@ for file in TARGET_FILES:
         total_rows += len(df)
 
         if 7 in df.columns:
-            mfg_df = df[df[7].astype(str).str.strip() == '製造業'].copy()
+            mfg_df = df[df[7].astype(str).str.strip() == '貨物取扱業'].copy()
             
             if not mfg_df.empty:
                 # 【中核の改修】中分類・小分類の座標（9, 11, 16, 18）を追加
