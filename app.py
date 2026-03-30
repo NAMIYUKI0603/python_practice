@@ -32,14 +32,44 @@ st.title("⚡ 労働災害 統合分析ダッシュボード")
 def load_data():
     df = pd.read_csv("output/master_sibou_all_industries.csv", encoding='utf-8-sig', low_memory=False)
     
-    # 階層グラフ（サンバースト）は欠損値(NaN)で描画エラーを起こすため、防御機構として「不明」で埋める
     fill_cols = ['起因物_大分類', '起因物_中分類', '起因物_小分類', '事業場規模', '発生時間']
     for col in fill_cols:
         if col in df.columns:
             df[col] = df[col].fillna('不明')
             
-    # 月や年の欠損も除外しておく
     df = df.dropna(subset=['年', '月'])
+
+    # --- 【ハイブリッド改修】事業場規模の意味的クレンジング（DBの限界 × 安衛法基準） ---
+    if '事業場規模' in df.columns:
+        def categorize_size(size_str):
+            s = str(size_str).replace(',', '') 
+            
+            # 1. 1〜9人（体制未整備）
+            if s in ['0', '0～9', '1～9']:
+                return '① 9人以下（安全衛生推進者 選任義務なし）'
+            
+            # 2. 10〜49人（推進者選任）
+            elif s in ['10～19', '10～29', '20～29', '30～39', '30～49', '40～49']:
+                return '② 10～49人（安全衛生推進者 選任義務）'
+            
+            # 3. 50〜299人（衛生管理者・産業医）
+            # ※衛生管理者の増員ライン(200人)は生データの「100～299」を分割できないためここで統合
+            elif s in ['50～99', '100～299']:
+                return '③ 50～299人（衛生管理者・産業医 選任義務）'
+                
+            # 4. 300〜999人（製造業等で総括安全衛生管理者）
+            elif s in ['300～499', '300～', '500～999']:
+                return '④ 300～999人（製造業等で 総括安全衛生管理者）'
+                
+            # 5. 1000人以上（全業種で総括・専属産業医）
+            elif s in ['1000～9999', '10000～']:
+                return '⑤ 1000人以上（専属産業医・全業種で総括）'
+                
+            else:
+                return '⑥ 不明・その他'
+                
+        df['事業場規模'] = df['事業場規模'].apply(categorize_size)
+
     return df
 
 df = load_data()
@@ -47,7 +77,6 @@ df = load_data()
 # --- 3. サイドバー（全方位フィルター設定） ---
 st.sidebar.header("🔍 フィルター設定")
 
-# ① 業種（階層連動）
 st.sidebar.subheader("🏢 業種")
 industry_l_list = ["すべて"] + sorted(df['業種_大分類'].unique().tolist())
 selected_l = st.sidebar.selectbox("業種（大分類）", industry_l_list)
@@ -68,7 +97,6 @@ selected_s = st.sidebar.selectbox("業種（小分類）", industry_s_list)
 
 st.sidebar.markdown("---")
 
-# ② 日時と規模（マルチセレクト）
 st.sidebar.subheader("⏱ 発生状況・規模")
 year_list = sorted(df['年'].unique().tolist())
 selected_years = st.sidebar.multiselect("発生年", year_list, default=year_list)
@@ -127,13 +155,11 @@ with col1:
 with col2:
     st.subheader("🎯 起因物（大→中→小 クリックでドリルダウン）")
     if not filtered_df.empty:
-        # 【中核の改修】サンバースト・チャート（階層型ドリルダウン）の適用
         fig_sunburst = px.sunburst(
             filtered_df, 
             path=['起因物_大分類', '起因物_中分類', '起因物_小分類'], 
             color_discrete_sequence=px.colors.sequential.Reds_r
         )
-        # 内訳のパーセンテージとラベルを表示
         fig_sunburst.update_traces(textinfo="label+percent parent")
         fig_sunburst.update_layout(margin=dict(l=0, r=0, t=30, b=0))
         st.plotly_chart(fig_sunburst, width="stretch")
