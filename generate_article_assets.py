@@ -3,14 +3,17 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 import re
+from datetime import datetime # タイムスタンプ用のモジュールを追加
 
 # --- 1. 空間設定とデータの精製 ---
-# Windows環境での日本語フォント強制指定
 plt.rcParams['font.family'] = 'MS Gothic'
 OUTPUT_DIR = "output_assets"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-print("--- 記事用アセット（画像）生成エンジン起動 ---")
+# 実行時のタイムスタンプを生成（例: 20260331_1150）
+current_time = datetime.now().strftime("%Y%m%d_%H%M")
+
+print(f"--- 記事用アセット（画像）生成エンジン起動 [{current_time}] ---")
 
 df = pd.read_csv("output/master_sibou_all_industries.csv", encoding='utf-8-sig', low_memory=False)
 mfg_df = df[df['業種_大分類'] == '製造業'].copy()
@@ -51,12 +54,14 @@ plt.xlabel("発生年", fontsize=12)
 plt.ylabel("死亡者数（人）", fontsize=12)
 plt.legend(title='起因物（中分類）', bbox_to_anchor=(1.05, 1), loc='upper left')
 
-# 【バグ修正】内部の絶対座標（0, 1, 2...）に対して、文字列ラベル（H21, H22...）を強制的にマッピングする
+# 内部の絶対座標と文字列ラベルの同期
 plt.xticks(range(len(trend_data.index)), trend_data.index, rotation=0)
 plt.xlim(0, len(trend_data.index) - 1)
 
 plt.tight_layout()
-trend_img = os.path.join(OUTPUT_DIR, "trend_10years_area_mfg.png")
+
+# 【改修】ファイル名にタイムスタンプを動的付与
+trend_img = os.path.join(OUTPUT_DIR, f"trend_10years_area_mfg_{current_time}.png")
 plt.savefig(trend_img, dpi=300)
 plt.close()
 
@@ -79,7 +84,8 @@ plt.ylabel("起因物（中分類）", fontsize=12)
 plt.xticks(rotation=45)
 plt.tight_layout()
 
-heatmap_img = os.path.join(OUTPUT_DIR, "heatmap_time_vs_cause_mfg_fixed.png")
+# 【改修】ファイル名にタイムスタンプを動的付与
+heatmap_img = os.path.join(OUTPUT_DIR, f"heatmap_time_vs_cause_mfg_{current_time}.png")
 plt.savefig(heatmap_img, dpi=300)
 plt.close()
 
