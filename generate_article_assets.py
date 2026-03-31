@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import japanize_matplotlib
 import os
+import re # 正規表現モジュールを投入
 
 # --- 1. 空間設定とデータの精製 ---
 plt.rcParams['font.family'] = 'MS Gothic'
@@ -11,70 +12,83 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 print("--- 記事用アセット（画像）生成エンジン起動 ---")
 
-# 死亡DBの読み込みと「製造業」への純化
 df = pd.read_csv("output/master_sibou_all_industries.csv", encoding='utf-8-sig', low_memory=False)
 mfg_df = df[df['業種_大分類'] == '製造業'].copy()
 
-# 欠損値と不要なノイズの排除
 mfg_df = mfg_df.dropna(subset=['年', '発生時間'])
 mfg_df['起因物_中分類'] = mfg_df['起因物_中分類'].fillna('不明')
-mfg_df['発生時間'] = mfg_df['発生時間'].fillna('不明')
+
+# --- 【中核の改修】発生時間の表記揺れ粉砕とゼロ埋め（00時台〜23時台） ---
+def format_time(t_str):
+    if pd.isna(t_str) or '不明' in str(t_str):
+        return '不明'
+    # 文字列の中から最初の数字の塊だけを抽出する
+    match = re.search(r'(\d+)', str(t_str))
+    if match:
+        hour = int(match.group(1))
+        # 2桁のゼロ埋め（例: 8 -> "08時台"）を行い、空間的ソートを完璧にする
+        return f"{hour:02d}時台"
+    return '不明'
+
+mfg_df['発生時間_整形'] = mfg_df['発生時間'].apply(format_time)
+# 不明なデータはヒートマップのノイズになるため除外
+mfg_df = mfg_df[mfg_df['発生時間_整形'] != '不明']
 
 print(f"対象データ: 製造業の死亡事故 {len(mfg_df)} 件")
 
-# --- 2. 視覚兵器①：10年推移と起因物の構造（積層型トレンド） ---
-print("1/2: 10年推移グラフの生成中...")
+# --- 2. 視覚兵器①：10年推移と起因物の構造（面グラフに変更） ---
+print("1/2: 10年推移グラフ（面グラフ）の生成中...")
 
-# 年別の総件数と、主要な起因物（トップ3）のクロス集計
 top_causes = mfg_df['起因物_中分類'].value_counts().nlargest(3).index.tolist()
-
-# 上位3つ以外を「その他」にまとめる
 mfg_df['起因物_表示用'] = mfg_df['起因物_中分類'].apply(lambda x: x if x in top_causes else 'その他')
+
 trend_data = pd.crosstab(mfg_df['年'], mfg_df['起因物_表示用'])
 
-# グラフ描画（積み上げ棒グラフ）
 fig, ax = plt.subplots(figsize=(12, 7))
-# 色のパターン設定（危険度を感じさせる赤〜グレーの配色）
 colors = ['#8B0000', '#CD5C5C', '#F08080', '#D3D3D3'] 
 
-trend_data.plot(kind='bar', stacked=True, color=colors, ax=ax, edgecolor='black')
-plt.title("【製造業】死亡労災の10年推移と主要起因物の構造", fontsize=16, fontweight='bold')
+# 【改修】kind='bar' から kind='area' へ変更し、面グラフ（地層）で出力
+trend_data.plot(kind='area', stacked=True, color=colors, ax=ax, alpha=0.8)
+
+plt.title("【製造業】死亡労災の10年推移と主要起因物の構造（面グラフ）", fontsize=16, fontweight='bold')
 plt.xlabel("発生年", fontsize=12)
 plt.ylabel("死亡者数（人）", fontsize=12)
 plt.legend(title='起因物（中分類）', bbox_to_anchor=(1.05, 1), loc='upper left')
-plt.xticks(rotation=0)
-plt.tight_layout()
 
-trend_img = os.path.join(OUTPUT_DIR, "trend_10years_mfg.png")
+# X軸の目盛りを全年代強制表示させる（面グラフ特有の端数表示を防ぐ）
+plt.xticks(trend_data.index, rotation=0)
+# X軸の余白を消し、空間をフルに使う
+plt.xlim(trend_data.index.min(), trend_data.index.max())
+
+plt.tight_layout()
+trend_img = os.path.join(OUTPUT_DIR, "trend_10years_area_mfg.png")
 plt.savefig(trend_img, dpi=300)
 plt.close()
 
-# --- 3. 視覚兵器②：死の交差点ヒートマップ（マトリクス分析） ---
+# --- 3. 視覚兵器②：死の交差点ヒートマップ（時間軸の整流化） ---
 print("2/2: 時間帯×起因物のヒートマップ生成中...")
 
-# 時間帯の表記揺れや順序を整理するためのリスト（存在するものだけ抽出）
-time_order = sorted([t for t in mfg_df['発生時間'].unique() if '～' in str(t)])
+# 00時台〜23時台という完璧な順番のリストを生成
+time_order = [f"{i:02d}時台" for i in range(24)]
 
-# 上位10の起因物に絞る（Y軸が長くなりすぎるのを防ぐ）
 top_10_causes = mfg_df['起因物_中分類'].value_counts().nlargest(10).index.tolist()
 heatmap_df = mfg_df[mfg_df['起因物_中分類'].isin(top_10_causes)]
 
-# クロス集計（マトリクスの生成）
-matrix_data = pd.crosstab(heatmap_df['起因物_中分類'], heatmap_df['発生時間'])
-# 存在する時間帯列だけを並び替え
-matrix_data = matrix_data[[c for c in time_order if c in matrix_data.columns]]
+# 新しく作った「発生時間_整形」の列を使ってクロス集計
+matrix_data = pd.crosstab(heatmap_df['起因物_中分類'], heatmap_df['発生時間_整形'])
 
-# ヒートマップの描画
-plt.figure(figsize=(14, 8))
-# cmap='Reds' で件数が多いセルほど血のような濃い赤で染まる
+# X軸を「00時台」から「23時台」まで完璧な順序で並び替える
+matrix_data = matrix_data.reindex(columns=time_order, fill_value=0)
+
+plt.figure(figsize=(15, 8))
 sns.heatmap(matrix_data, annot=True, fmt="d", cmap="Reds", linewidths=.5, cbar_kws={'label': '死亡件数'})
-plt.title("【製造業】起因物 × 発生時間帯の死のヒートマップ（濃い赤＝極大危険地帯）", fontsize=16, fontweight='bold')
-plt.xlabel("発生時間帯", fontsize=12)
+plt.title("【製造業】起因物 × 発生時間帯の死のヒートマップ（完全整流化版）", fontsize=16, fontweight='bold')
+plt.xlabel("発生時間帯（00時〜23時）", fontsize=12)
 plt.ylabel("起因物（中分類）", fontsize=12)
 plt.xticks(rotation=45)
 plt.tight_layout()
 
-heatmap_img = os.path.join(OUTPUT_DIR, "heatmap_time_vs_cause_mfg.png")
+heatmap_img = os.path.join(OUTPUT_DIR, "heatmap_time_vs_cause_mfg_fixed.png")
 plt.savefig(heatmap_img, dpi=300)
 plt.close()
 
