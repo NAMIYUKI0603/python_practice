@@ -9,7 +9,7 @@ from janome.tokenizer import Tokenizer
 from datetime import datetime
 
 # --- 1. 空間設計（ディレクトリと経路） ---
-INPUT_TEXT = "input/input.txt"
+INPUT_TEXT = "input/input_死亡労災製造業.txt"
 STOPWORDS_DIR = "stopwords"
 OUTPUT_DIR = "output_assets"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
