@@ -58,7 +58,7 @@ colors = ['#5c0000', '#8a0000', '#b80000', '#e60000', '#ff4d4d', '#D3D3D3']
 
 trend_data.plot(kind='area', stacked=True, color=colors, ax=ax, alpha=0.8)
 
-plt.title("【製造業】死亡労災の10年推移と主要起因物の構造（上位5分類）", fontsize=16, fontweight='bold')
+plt.title("【製造業】死亡労災の15年推移と主要起因物の構造（上位5分類）", fontsize=16, fontweight='bold')
 plt.xlabel("発生年", fontsize=12)
 plt.ylabel("死亡者数（人）", fontsize=12)
 plt.legend(title='起因物（中分類）', bbox_to_anchor=(1.05, 1), loc='upper left')
@@ -85,7 +85,7 @@ matrix_data = matrix_data.reindex(columns=time_order, fill_value=0)
 
 plt.figure(figsize=(15, 8))
 sns.heatmap(matrix_data, annot=True, fmt="d", cmap="Reds", linewidths=.5, cbar_kws={'label': '死亡件数'})
-plt.title("【製造業】起因物 × 発生時間帯の死のヒートマップ（完全整流化版）", fontsize=16, fontweight='bold')
+plt.title("【製造業】起因物 × 発生時間帯の死のヒートマップ", fontsize=16, fontweight='bold')
 plt.xlabel("発生時間帯（00時〜23時）", fontsize=12)
 plt.ylabel("起因物（中分類）", fontsize=12)
 plt.xticks(rotation=45)
