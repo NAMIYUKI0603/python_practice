@@ -37,7 +37,7 @@ mfg_df = mfg_df[mfg_df['発生時間_整形'] != '不明']
 
 print(f"対象データ: 製造業の死亡事故 {len(mfg_df)} 件")
 
-# --- 2. 視覚兵器①：10年推移と起因物の構造（面グラフ / トップ5抽出） ---
+# --- 2. 視覚兵器①：15年推移と起因物の構造（面グラフ / トップ5抽出） ---
 print("1/2: 10年推移グラフ（面グラフ）の生成中...")
 
 # 真のトップ5を発生件数順にリスト化
@@ -68,7 +68,7 @@ plt.xlim(0, len(trend_data.index) - 1)
 
 plt.tight_layout()
 
-trend_img = os.path.join(OUTPUT_DIR, f"trend_10years_area_mfg_{current_time}.png")
+trend_img = os.path.join(OUTPUT_DIR, f"trend_15years_area_mfg_{current_time}.png")
 plt.savefig(trend_img, dpi=300)
 plt.close()
 
