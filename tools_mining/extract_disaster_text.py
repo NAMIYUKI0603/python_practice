@@ -12,7 +12,7 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 # 絞り込まない場合は None を指定しろ
 TARGET_INDUSTRY = "製造業"           # 大分類（例: "製造業", "建設業", None）
 TARGET_CAUSE = "動力運搬機"          # 起因物の中分類（例: "動力運搬機", "一般動力機械", None）
-TARGET_HOUR = "19時台"               # 発生時間帯（例: "10時台", "08時台", None）
+TARGET_HOUR = None               # 発生時間帯（例: "10時台", "08時台", None）
 
 # 出力ファイル名のタイムスタンプ
 current_time = datetime.now().strftime("%Y%m%d_%H%M")
