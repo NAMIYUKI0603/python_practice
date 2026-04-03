@@ -11,7 +11,7 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 # ★★★ フィルター条件設定 ★★★
 # 絞り込まない場合は None を指定しろ
 TARGET_INDUSTRY = "製造業"           # 大分類（例: "製造業", "建設業", None）
-TARGET_CAUSE = "動力運搬機"          # 起因物の中分類（例: "動力運搬機", "一般動力機械", None）
+TARGET_CAUSE = "一般動力機械"          # 起因物の中分類（例: "動力運搬機", "一般動力機械", None）
 TARGET_HOUR = None               # 発生時間帯（例: "10時台", "08時台", None）
 
 # 出力ファイル名のタイムスタンプ

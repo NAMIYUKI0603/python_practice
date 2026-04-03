@@ -12,7 +12,7 @@ import numpy as np
 from PIL import Image
 
 # --- 1. 空間設計と制御パラメータ ---
-INPUT_TEXT = "input/input_製造業_動力運搬機_20260402_1650.txt" 
+INPUT_TEXT = "input/input_製造業_一般動力機械_20260403_1542.txt" 
 STOPWORDS_DIR = "stopwords"               
 FONT_PATH = "font/BIZ-UDGothicR.ttc"      
 
@@ -23,9 +23,9 @@ COLOR_MAP = "Reds"
 timestamp = datetime.now().strftime("%Y%m%d_%H%M")
 base_name = os.path.splitext(os.path.basename(INPUT_TEXT))[0]
 
-OUTPUT_WC = f"output/wordcloud_{base_name}_{timestamp}.png"
-OUTPUT_CHART = f"output/top50_{base_name}_{timestamp}.png"
-OUTPUT_CSV = f"output/top50_{base_name}_{timestamp}.csv"
+OUTPUT_WC = f"output_assets/wordcloud_{base_name}_{timestamp}.png"
+OUTPUT_CHART = f"output_assets/top50_{base_name}_{timestamp}.png"
+OUTPUT_CSV = f"output_assets/top50_{base_name}_{timestamp}.csv"
 
 for d in ["input", "output", STOPWORDS_DIR, "font"]:
     os.makedirs(d, exist_ok=True)
