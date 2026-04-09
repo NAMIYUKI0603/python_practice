@@ -9,7 +9,7 @@ from janome.tokenizer import Tokenizer
 from datetime import datetime
 
 # --- 1. 空間設計（ディレクトリと経路） ---
-INPUT_TEXT = "input/input_製造業_動力運搬機_20260403_1523.txt"
+INPUT_TEXT = "input/input_製造業_仮設物、建築物、構築物等_10時台_20260409_1427.txt"
 STOPWORDS_DIR = "stopwords"
 OUTPUT_DIR = "output_assets"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -21,7 +21,7 @@ base_name = os.path.splitext(os.path.basename(INPUT_TEXT))[0]
 OUTPUT_IMAGE = os.path.join(OUTPUT_DIR, f"network_{base_name}_{current_time}.png")
 
 # ★分析の解像度調整パラメータ
-MIN_EDGE_WEIGHT = 5   # 最低何回ペアになったら線を結ぶか
+MIN_EDGE_WEIGHT = 3   # 最低何回ペアになったら線を結ぶか
 MAX_NODES = 50         # 画面に表示する最大単語数
 
 print(f"--- 共起ネットワーク分析エンジン起動 [{current_time}] ---")
