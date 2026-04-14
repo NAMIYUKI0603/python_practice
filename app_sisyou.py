@@ -30,10 +30,10 @@ st.title("⚡ 製造業 死傷労災 統合分析ダッシュボード")
 # --- 2. データの読み込みと安全処理 ---
 @st.cache_data
 def load_data():
-    # 【改修】読み込みファイルを死傷労災データに変更
+    # データの読み込み（inputフォルダ内を指定）
     df = pd.read_csv("input/master_sisyou_manufacturing_detailed.csv", encoding='utf-8-sig', low_memory=False)
     
-    # 【改修】年齢カラムを補完対象に追加
+    # 欠損値の補完
     fill_cols = ['起因物_大分類', '起因物_中分類', '起因物_小分類', '事業場規模', '発生時間', '年齢']
     for col in fill_cols:
         if col in df.columns:
@@ -53,6 +53,25 @@ def load_data():
             else: return '⑥ 不明・その他'
                 
         df['事業場規模'] = df['事業場規模'].apply(categorize_size)
+
+    # --- 【完全改修】年齢を「年代」に圧縮する処理 ---
+    if '年齢' in df.columns:
+        def categorize_age(age_val):
+            if pd.isna(age_val) or str(age_val).strip() == '不明':
+                return '不明'
+            try:
+                # 文字列の年齢を数値化（例："25" → 25）
+                age = int(float(age_val))
+                if age < 20: 
+                    return '10代以下'
+                elif age >= 70: 
+                    return '70代以上'  # 70歳以上はまとめて危険層として扱う
+                else: 
+                    return f"{age // 10 * 10}代"  # 例: 25 // 10 * 10 = 20 → "20代"
+            except:
+                return '不明'
+                
+        df['年代'] = df['年齢'].apply(categorize_age)
 
     return df
 
@@ -94,24 +113,33 @@ selected_times = st.sidebar.multiselect("発生時間帯", time_list, default=ti
 size_list = sorted(df['事業場規模'].unique().tolist())
 selected_sizes = st.sidebar.multiselect("事業場規模", size_list, default=size_list)
 
-# 【追加】年齢フィルター
-if '年齢' in df.columns:
-    age_list = sorted(df['年齢'].astype(str).unique().tolist())
-    selected_ages = st.sidebar.multiselect("被災者年齢", age_list, default=age_list)
+# 【完全改修】年齢フィルターを「年代」に変更
+if '年代' in df.columns:
+    age_list = sorted(df['年代'].unique().tolist())
+    selected_ages = st.sidebar.multiselect("被災者年代", age_list, default=age_list)
 else:
     selected_ages = []
 
 # --- 4. 空間のフィルタリング（階層的な絞り込み） ---
 filtered_df = df.copy()
 
-if selected_l != "すべて": filtered_df = filtered_df[filtered_df['業種_大分類'] == selected_l]
-if selected_m != "すべて": filtered_df = filtered_df[filtered_df['業種_中分類'] == selected_m]
-if selected_s != "すべて": filtered_df = filtered_df[filtered_df['業種_小分類'] == selected_s]
-if selected_years: filtered_df = filtered_df[filtered_df['年'].isin(selected_years)]
-if selected_months: filtered_df = filtered_df[filtered_df['月'].isin(selected_months)]
-if selected_times: filtered_df = filtered_df[filtered_df['発生時間'].isin(selected_times)]
-if selected_sizes: filtered_df = filtered_df[filtered_df['事業場規模'].isin(selected_sizes)]
-if selected_ages and '年齢' in filtered_df.columns: filtered_df = filtered_df[filtered_df['年齢'].astype(str).isin(selected_ages)]
+if selected_l != "すべて":
+    filtered_df = filtered_df[filtered_df['業種_大分類'] == selected_l]
+if selected_m != "すべて":
+    filtered_df = filtered_df[filtered_df['業種_中分類'] == selected_m]
+if selected_s != "すべて":
+    filtered_df = filtered_df[filtered_df['業種_小分類'] == selected_s]
+
+if selected_years:
+    filtered_df = filtered_df[filtered_df['年'].isin(selected_years)]
+if selected_months:
+    filtered_df = filtered_df[filtered_df['月'].isin(selected_months)]
+if selected_times:
+    filtered_df = filtered_df[filtered_df['発生時間'].isin(selected_times)]
+if selected_sizes:
+    filtered_df = filtered_df[filtered_df['事業場規模'].isin(selected_sizes)]
+if selected_ages and '年代' in filtered_df.columns:
+    filtered_df = filtered_df[filtered_df['年代'].isin(selected_ages)]
 
 # --- 5. メイン画面の描画（グラフの生成） ---
 st.markdown(f"### 現在の抽出件数: {len(filtered_df)} 件")
@@ -153,7 +181,7 @@ with col2:
 st.markdown("---")
 st.subheader("📋 抽出データ一覧（災害状況の確認）")
 if not filtered_df.empty:
-    # 【改修】一覧にも年齢を追加
-    display_cols = ['年', '月', '発生時間', '事業場規模', '年齢', '業種_小分類', '起因物_小分類', '事故の型', '災害状況']
+    # 一覧の表示項目に「年齢」と「年代」を追加
+    display_cols = ['年', '月', '発生時間', '事業場規模', '年代', '年齢', '業種_小分類', '起因物_小分類', '事故の型', '災害状況']
     available_cols = [col for col in display_cols if col in filtered_df.columns]
     st.dataframe(filtered_df[available_cols].head(100))
