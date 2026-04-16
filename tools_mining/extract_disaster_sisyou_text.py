@@ -24,7 +24,7 @@ TARGET_CAUSE_SMALL  = ["通路"]                      # 起因物_小分類
 
 # 【状況・属性フィルター】
 TARGET_HOURS = []                                   # 発生時間帯（例: ["08時台", "10時台"]）
-TARGET_AGE_GROUPS = ["50代", "60代", "70代以上"]    # 年代（例: ["50代", "60代", "70代以上"]）
+TARGET_AGE_GROUPS = ["10代未満", "20代", "30代", "40代"]    # 年代（例: ["50代", "60代", "70代以上"]）
 
 # 出力ファイル名のタイムスタンプ
 current_time = datetime.now().strftime("%Y%m%d_%H%M")
@@ -135,4 +135,4 @@ with open(output_path, 'w', encoding='utf-8') as f:
     f.write(final_text)
 
 print(f"[完了] 抽出テキストを保存しました: {output_path}")
-print("-> 次のステップ：得られたテキストを共起ネットワークに放り込み、「その他」の闇を暴け。")
+print("-> 次のステップ：得られたテキストを共起ネットワークに放り込め。")
