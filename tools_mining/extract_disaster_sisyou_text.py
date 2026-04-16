@@ -14,8 +14,8 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # 【業種フィルター】
 TARGET_IND_LARGE  = ["製造業"]                      # 業種_大分類
-TARGET_IND_MEDIUM = []                              # 業種_中分類（例: ["食料品製造業"]）
-TARGET_IND_SMALL  = ["その他の食料品製造業"]        # 業種_小分類
+TARGET_IND_MEDIUM = ["食料品製造業"]                              # 業種_中分類（例: ["食料品製造業"]）
+TARGET_IND_SMALL  = []        # 業種_小分類
 
 # 【起因物フィルター】
 TARGET_CAUSE_LARGE  = []                            # 起因物_大分類

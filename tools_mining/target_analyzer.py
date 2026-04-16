@@ -4,11 +4,11 @@ import re
 
 # --- 1. 空間設計（顕微鏡の設定） ---
 # ★調べたい単語（ターゲット）をここに記述
-TARGET_WORD = "コンクリート"  # 例：「予算」「火山」「避難」などに書き換える
+TARGET_WORD = "清掃"  # 例：「予算」「火山」「避難」などに書き換える
 
 # ★対象とする年度のテキストファイルを指定
 # （7年分一気に調べたい場合は input/bousai_*_part1.txt にする）
-INPUT_FILES = "input_製造業_仮設物、建築物、構築物等_10時台_20260409_1427.txt" 
+INPUT_FILES = "input/input_製造業_食料品製造_通路_高齢層_20260416_1302.txt" 
 OUTPUT_FILE = f"output/targeting_{TARGET_WORD}_context.txt"
 
 # --- 2. 抽出機構（KWIC：Keyword in Context） ---
