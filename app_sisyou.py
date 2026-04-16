@@ -157,7 +157,7 @@ with col1:
         fig_bar.update_layout(
             yaxis={'categoryorder':'total ascending'},
             xaxis=dict(showgrid=True, gridcolor='lightgray'),
-            plot_bgcolor='white',
+            plot_bgcolor='black',
             margin=dict(l=0, r=0, t=30, b=0)
         ) 
         st.plotly_chart(fig_bar, width="stretch")
