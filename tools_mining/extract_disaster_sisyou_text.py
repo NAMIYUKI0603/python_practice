@@ -20,7 +20,7 @@ TARGET_IND_SMALL  = []        # 業種_小分類
 # 【起因物フィルター】
 TARGET_CAUSE_LARGE  = []                            # 起因物_大分類
 TARGET_CAUSE_MEDIUM = []                            # 起因物_中分類
-TARGET_CAUSE_SMALL  = ["通路"]                      # 起因物_小分類
+TARGET_CAUSE_SMALL  = ["食品加工用機械"]                      # 起因物_小分類
 
 # 【状況・属性フィルター】
 TARGET_HOURS = []                                   # 発生時間帯（例: ["08時台", "10時台"]）

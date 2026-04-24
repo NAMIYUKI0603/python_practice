@@ -5,7 +5,7 @@ import plotly.express as px
 # --- 0. 防弾ドア（セキュリティロック） ---
 def check_password():
     def password_entered():
-        if st.session_state["password"] == "namiyuki2026":
+        if st.session_state["password"] == "namiyuki2026si":
             st.session_state["password_correct"] = True
             del st.session_state["password"]  
         else:
