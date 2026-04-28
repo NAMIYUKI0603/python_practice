@@ -30,8 +30,8 @@ st.title("⚡ 製造業 死傷労災 統合分析ダッシュボード")
 # --- 2. データの読み込みと安全処理 ---
 @st.cache_data
 def load_data():
-    # データの読み込み（inputフォルダ内を指定）
-    df = pd.read_csv("input/master_sisyou_manufacturing_detailed.csv", encoding='utf-8-sig', low_memory=False)
+    # データの読み込み（ルートディレクトリのZIPを直接指定）
+    df = pd.read_csv("master_sisyou_manufacturing_detailed.zip", encoding='utf-8-sig', low_memory=False)
     
     # 欠損値の補完
     fill_cols = ['起因物_大分類', '起因物_中分類', '起因物_小分類', '事業場規模', '発生時間', '年齢']
@@ -179,9 +179,25 @@ with col2:
         st.info("条件に一致するデータがありません。")
 
 st.markdown("---")
-st.subheader("📋 抽出データ一覧（災害状況の確認）")
+# --- 6. データテーブルの防衛的描画 ---
+st.subheader("📋 抽出データ一覧（災害状況のサンプリング確認）")
+
 if not filtered_df.empty:
-    # 一覧の表示項目に「年齢」と「年代」を追加
+    total_hits = len(filtered_df)
+    
+    # 顧客に「本当の件数」を見せつける
+    st.info(f"💡 該当する災害データは **計 {total_hits:,} 件** です。")
+    
+    # 表示上限の設定
+    DISPLAY_LIMIT = 300
+    
+    if total_hits > DISPLAY_LIMIT:
+        st.warning(f"※サーバー負荷軽減およびデータ保護の観点から、一覧表へのテキスト表示は **上位 {DISPLAY_LIMIT} 件** に制限しています。全体の傾向は上部のグラフで確認してください。")
+    
+    # 一覧の表示項目
     display_cols = ['年', '月', '発生時間', '事業場規模', '年代', '年齢', '業種_小分類', '起因物_小分類', '事故の型', '災害状況']
     available_cols = [col for col in display_cols if col in filtered_df.columns]
-    st.dataframe(filtered_df[available_cols].head(100))
+    
+    st.dataframe(filtered_df[available_cols].head(DISPLAY_LIMIT))
+else:
+    st.warning("条件に一致するデータがありません。フィルター設定を変更してください。")
