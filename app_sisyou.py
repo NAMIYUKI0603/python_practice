@@ -31,7 +31,7 @@ st.title("⚡ 製造業 死傷労災 統合分析ダッシュボード")
 @st.cache_data
 def load_data():
     # データの読み込み（ルートディレクトリのZIPを直接指定）
-    df = pd.read_csv("master_sisyou_manufacturing_detailed.zip", encoding='utf-8-sig', low_memory=False)
+    df = pd.read_csv("input/master_sisyou_manufacturing_detailed.csv", encoding='utf-8-sig', low_memory=False)
     
     # 欠損値の補完
     fill_cols = ['起因物_大分類', '起因物_中分類', '起因物_小分類', '事業場規模', '発生時間', '年齢']
