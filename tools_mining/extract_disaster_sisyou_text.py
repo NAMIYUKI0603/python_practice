@@ -14,17 +14,17 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # 【業種フィルター】
 TARGET_IND_LARGE  = ["製造業"]                      # 業種_大分類
-TARGET_IND_MEDIUM = ["食料品製造業"]                              # 業種_中分類（例: ["食料品製造業"]）
+TARGET_IND_MEDIUM = ["金属製品製造業"]                              # 業種_中分類（例: ["食料品製造業"]）
 TARGET_IND_SMALL  = []        # 業種_小分類
 
 # 【起因物フィルター】
 TARGET_CAUSE_LARGE  = []                            # 起因物_大分類
-TARGET_CAUSE_MEDIUM = []                            # 起因物_中分類
-TARGET_CAUSE_SMALL  = ["食品加工用機械"]                      # 起因物_小分類
+TARGET_CAUSE_MEDIUM = ["材料"]                            # 起因物_中分類
+TARGET_CAUSE_SMALL  = []                      # 起因物_小分類
 
 # 【状況・属性フィルター】
 TARGET_HOURS = []                                   # 発生時間帯（例: ["08時台", "10時台"]）
-TARGET_AGE_GROUPS = ["10代未満", "20代", "30代", "40代"]    # 年代（例: ["50代", "60代", "70代以上"]）
+TARGET_AGE_GROUPS = []    # 年代（例: ["50代", "60代", "70代以上"]）
 
 # 出力ファイル名のタイムスタンプ
 current_time = datetime.now().strftime("%Y%m%d_%H%M")

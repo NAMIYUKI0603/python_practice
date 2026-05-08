@@ -12,13 +12,13 @@ import numpy as np
 from PIL import Image
 
 # --- 1. 空間設計と制御パラメータ ---
-INPUT_TEXT = "input/input_製造業_食料品製造_食品加工用機械_年代指定_20260420_1430.txt" 
+INPUT_TEXT = "input/input_製造業_金属製品製_仮設物、_20260508_1046.txt" 
 STOPWORDS_DIR = "stopwords"               
 FONT_PATH = "font/BIZ-UDGothicR.ttc"      
 
 MASK_IMAGE_PATH = "input/mask.png"  
-MAX_WORDS_COUNT = 150               
-COLOR_MAP = "Reds"                  
+MAX_WORDS_COUNT = 300               
+COLOR_MAP = "autumn"                  
 
 timestamp = datetime.now().strftime("%Y%m%d_%H%M")
 base_name = os.path.splitext(os.path.basename(INPUT_TEXT))[0]
@@ -74,6 +74,13 @@ if not words:
 
 # --- 4. 頻度集計とノイズ検知用データの出力 ---
 word_counts = collections.Counter(words)
+
+# ★ 【追加機能】任意の単語のサイズ（頻度）を強制的に書き換える
+# 大きくしたい単語があれば、ここのコメントアウトを外して数値を設定してください
+# 実際の出現回数に関わらず、指定した数値の大きさで描画されます。
+# word_counts["軍手"] = 500  
+# word_counts["金型"] = 300
+
 top50 = word_counts.most_common(50)
 
 df_top50 = pd.DataFrame(top50, columns=['単語', '出現回数'])
@@ -94,9 +101,8 @@ plt.tight_layout()
 plt.savefig(OUTPUT_CHART)
 print(f"[OK] 上位50語のグラフを保存しました: {OUTPUT_CHART}")
 
-# --- 5. ワードクラウドの生成（MASK対応・境界線消去） ---
+# --- 5. ワードクラウドの生成（MASK対応・完全横書き化） ---
 print("ワードクラウドを描画中...")
-text_for_wc = " ".join(words)
 
 mask_array = None
 if os.path.exists(MASK_IMAGE_PATH):
@@ -121,9 +127,13 @@ wordcloud = WordCloud(
     collocations=False,
     max_words=MAX_WORDS_COUNT,      
     mask=mask_array,                
-    contour_width=0,                # ★ここを0にして境界線を完全に消去
-    contour_color='darkred'
-).generate(text_for_wc)
+    contour_width=0,                
+    contour_color='darkred',
+    prefer_horizontal=1.0           # ★ここを1.0にして文字を完全に横並びに固定
+)
+
+# ★ generate() から generate_from_frequencies() に変更し、辞書データから直接生成
+wordcloud.generate_from_frequencies(word_counts)
 
 plt.figure(figsize=(15, 10))
 plt.imshow(wordcloud, interpolation="bilinear")
