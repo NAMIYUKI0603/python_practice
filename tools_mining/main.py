@@ -17,8 +17,8 @@ STOPWORDS_DIR = "stopwords"
 FONT_PATH = "font/BIZ-UDGothicR.ttc"      
 
 MASK_IMAGE_PATH = "input/mask.png"  
-MAX_WORDS_COUNT = 300               
-COLOR_MAP = "autumn"                  
+MAX_WORDS_COUNT = 500               
+COLOR_MAP = "inferno"                  
 
 timestamp = datetime.now().strftime("%Y%m%d_%H%M")
 base_name = os.path.splitext(os.path.basename(INPUT_TEXT))[0]
