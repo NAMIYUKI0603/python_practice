@@ -62,7 +62,7 @@ for file in TARGET_FILES:
                 mfg_rows += len(mfg_df)
                 print(f" -> 抽出完了（赤のコア: {len(mfg_df)}件）")
             else:
-                print(" -> [スキップ] 製造業のデータが存在しません。")
+                print(" -> [スキップ] 鉱業のデータが存在しません。")
         else:
             print(" -> [警告] 想定される座標（列）が存在しません。")
 
@@ -78,7 +78,7 @@ if all_data:
     end_time = time.time()
     print(f"[完了] 所要時間: {end_time - start_time:.1f}秒")
     print(f"総読み込み行数 (ノイズ・ヘッダー含む) : {total_rows} 行")
-    print(f"製造業のみの純化データ (赤のコア)       : {mfg_rows} 件")
+    print(f"建設業のみの純化データ (赤のコア)       : {mfg_rows} 件")
     print(f"\n[指示] 以下の場所に出荷されました: {os.path.abspath(OUTPUT_CSV)}")
 else:
     print("[失敗] 結合できるデータがありませんでした。")
