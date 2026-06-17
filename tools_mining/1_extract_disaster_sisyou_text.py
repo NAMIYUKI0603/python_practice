@@ -3,8 +3,8 @@ import os
 import re
 from datetime import datetime
 
-# --- 1. 空間設定と抽出条件（ここを毎回書き換えて狙い撃つ） ---
-INPUT_CSV = "input/master_sisyou_manufacturing_detailed.csv"
+# --- 1. 空間設計と抽出条件（ここを毎回書き換えて狙い撃つ） ---
+INPUT_CSV = "input/死傷労災_製造業.csv"
 OUTPUT_DIR = "input"  
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -18,9 +18,9 @@ TARGET_IND_MEDIUM = ["金属製品製造業"]                              # 業
 TARGET_IND_SMALL  = []        # 業種_小分類
 
 # 【起因物フィルター】
-TARGET_CAUSE_LARGE  = []                            # 起因物_大分類
-TARGET_CAUSE_MEDIUM = ["材料"]                            # 起因物_中分類
-TARGET_CAUSE_SMALL  = []                      # 起因物_小分類
+TARGET_CAUSE_LARGE  = []                                    # 起因物_大分類
+TARGET_CAUSE_MEDIUM = ["金属加工用機械"]                                    # 起因物_中分類
+TARGET_CAUSE_SMALL  = []                              # 起因物_小分類
 
 # 【状況・属性フィルター】
 TARGET_HOURS = []                                   # 発生時間帯（例: ["08時台", "10時台"]）
@@ -55,14 +55,22 @@ def categorize_age(age_val):
     except:
         return '不明'
 
-# --- 3. データの読み込みと前処理 ---
+# --- 3. データの読み込みと前処理（文字コード不一致を完全リカバリー） ---
 print("死傷労災マスターデータベースを読み込み中...")
 if not os.path.exists(INPUT_CSV):
     print(f"[異常終了] マスターCSVが見つかりません: {INPUT_CSV}")
     print("データが input フォルダ内にあるか確認してください。")
     exit()
 
-df = pd.read_csv(INPUT_CSV, encoding='utf-8-sig', low_memory=False)
+# 【中核の改修】文字コードエラーの自動リカバリートラップ
+try:
+    # まず標準の utf-8-sig で読み込みを試行
+    df = pd.read_csv(INPUT_CSV, encoding='utf-8-sig', low_memory=False)
+except UnicodeDecodeError:
+    # utf-8で弾かれた場合、自動で cp932（Shift-JIS拡張）に切り替えて読み込みを救済
+    print("  └ [通知] utf-8-sigでエラーを検知。cp932（Shift-JIS）に切り替えて再試行します...")
+    df = pd.read_csv(INPUT_CSV, encoding='cp932', low_memory=False)
+    print("  └ [成功] 文字コードの壁をクリアしました。")
 
 # 必須項目の欠損を除去
 df = df.dropna(subset=['災害状況', '年'])
@@ -80,7 +88,6 @@ filter_names = []
 
 if TARGET_IND_LARGE:
     filtered_df = filtered_df[filtered_df['業種_大分類'].isin(TARGET_IND_LARGE)]
-    # ファイル名が長くなりすぎるのを防ぐため、大分類は名称の先頭要素だけ記録
     filter_names.append(TARGET_IND_LARGE[0][:3])
 
 if TARGET_IND_MEDIUM:
