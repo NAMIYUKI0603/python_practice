@@ -19,7 +19,7 @@ TARGET_IND_SMALL  = []        # 業種_小分類
 
 # 【起因物フィルター】
 TARGET_CAUSE_LARGE  = []                                    # 起因物_大分類
-TARGET_CAUSE_MEDIUM = ["金属加工用機械"]                                    # 起因物_中分類
+TARGET_CAUSE_MEDIUM = ["材料"]                                    # 起因物_中分類
 TARGET_CAUSE_SMALL  = []                              # 起因物_小分類
 
 # 【状況・属性フィルター】
