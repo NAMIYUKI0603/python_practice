@@ -6,14 +6,16 @@ import seaborn as sns
 import re
 from datetime import datetime
 
-# --- 1. 空間設計と抽出条件 ---
-plt.rcParams['font.family'] = 'MS Gothic' # Windows標準フォント（環境に合わせて変更せよ）
+# --- 1. 空間設計と抽出条件（ここを毎回書き換えて狙い撃つ） ---
+plt.rcParams['font.family'] = 'MS Gothic' # Windows標準フォント
 
-INPUT_CSV = "input/死傷労災_製造業.csv" 
+INPUT_CSV = "input/master_sisyou_all_cleaned.csv" 
 OUTPUT_DIR = "output_assets"  
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# ★★★ フィルター条件設定 ★★★
+# ★★★ フィルター条件設定（フル階層・複数指定対応版） ★★★
+# 複数指定したい場合はリスト形式 ["A", "B"] で記述。全件対象の場合は空リスト [] を指定。
+
 # 【業種フィルター】
 TARGET_IND_LARGE  = ["製造業"]                      # 業種_大分類
 TARGET_IND_MEDIUM = ["金属製品製造業"]                              # 業種_中分類
@@ -21,15 +23,18 @@ TARGET_IND_SMALL  = []                              # 業種_小分類
 
 # 【起因物フィルター】
 TARGET_CAUSE_LARGE  = []                            # 起因物_大分類
-TARGET_CAUSE_MEDIUM = ["材料"]            # 起因物_中分類
+TARGET_CAUSE_MEDIUM = ["金属加工用機械"]            # 起因物_中分類
 TARGET_CAUSE_SMALL  = []                            # 起因物_小分類
 
+# 【事故の型フィルター】 ★★★ 新規追加の狙撃兵器 ★★★
+TARGET_ACCIDENT_TYPE = []                           # 事故の型（例: ["はさまれ、巻き込まれ", "転倒", "切れ物との接触"]）
+
 # 【状況・属性フィルター】
-TARGET_HOURS = []                                   # 発生時間帯
-TARGET_AGE_GROUPS = []                              # 年代
+TARGET_HOURS = []                                   # 発生時間帯（例: ["08時台", "10時台"]）
+TARGET_AGE_GROUPS = []                              # 年代（例: ["50代", "60代"]）
 
 current_time = datetime.now().strftime("%Y%m%d_%H%M")
-print(f"--- スナイパー型アセット生成エンジン（数値ラベル・表データ出力版）起動 [{current_time}] ---")
+print(f"--- スナイパー型アセット生成エンジン（事故の型フィルター実装版）起動 [{current_time}] ---")
 
 # --- 2. データ整形ロジック ---
 def format_time(t_str):
@@ -72,7 +77,7 @@ df = df[df['発生時間_整形'] != '不明']
 if '年齢' in df.columns:
     df['年代'] = df['年齢'].apply(categorize_age)
 
-# --- 4. フィルター適用 ---
+# --- 4. フィルターの容赦ない適用（全階層対応） ---
 filtered_df = df.copy()
 filter_names = []
 
@@ -93,6 +98,12 @@ if TARGET_CAUSE_MEDIUM:
 if TARGET_CAUSE_SMALL:
     filtered_df = filtered_df[filtered_df['起因物_小分類'].isin(TARGET_CAUSE_SMALL)]
 
+# 【改修】事故の型フィルターの適用
+if TARGET_ACCIDENT_TYPE:
+    filtered_df = filtered_df[filtered_df['事故の型'].isin(TARGET_ACCIDENT_TYPE)]
+    # 出力ファイル名に事故の型を一部反映
+    filter_names.append(TARGET_ACCIDENT_TYPE[0][:4])
+
 if TARGET_HOURS:
     filtered_df = filtered_df[filtered_df['発生時間_整形'].isin(TARGET_HOURS)]
 if TARGET_AGE_GROUPS and '年代' in filtered_df.columns:
@@ -110,13 +121,13 @@ if record_count == 0:
 if TARGET_CAUSE_SMALL:
     TARGET_AXIS_COL = '起因物_小分類'
 elif TARGET_CAUSE_MEDIUM:
-    TARGET_AXIS_COL = '起因物_小分類'  # 中分類固定なら、自動で小分類へシフト
+    TARGET_AXIS_COL = '起因物_小分類'  # 中分類固定なら、自動で小分類へドリルダウン
 else:
     TARGET_AXIS_COL = '起因物_中分類'
 
 filtered_df[TARGET_AXIS_COL] = filtered_df[TARGET_AXIS_COL].fillna('不明')
 
-# --- 6. 視覚兵器①：進化型・数値ラベル付き積み上げ棒グラフ（上位5分類） ---
+# --- 6. 視覚兵器①：数値ラベル付き積み上げ棒グラフ（上位5分類） ---
 print("1/2: 数値ラベル付き推移グラフ（積み上げ棒グラフ）の生成中...")
 
 top_causes = filtered_df[TARGET_AXIS_COL].value_counts().nlargest(5).index.tolist()
@@ -132,9 +143,12 @@ ordered_cols = top_causes + ['その他']
 ordered_cols = [c for c in ordered_cols if c in trend_data.columns]
 trend_data = trend_data[ordered_cols]
 
-# 【アプローチB：データテーブルの動的テキスト出力】
+# 【依存関係防御】tabulateが環境になくても通常出力で救済する設計
 print("\n▼▼▼ 【コピペ用】各年の正確な数値データテーブル ▼▼▼")
-print(trend_data.to_markdown())
+try:
+    print(trend_data.to_markdown())
+except ImportError:
+    print(trend_data.to_string())
 print("▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲\n")
 
 # キャンバス設計
@@ -145,32 +159,27 @@ colors = colors[:len(ordered_cols)]
 # 積み上げ棒グラフとしてプロット
 trend_data.plot(kind='bar', stacked=True, color=colors, ax=ax, alpha=0.9, width=0.7)
 
-# 【中核の機能追加】各層（ブロック）の内部に、正確な被災者数を自動刻印するロジック
+# 各ブロックの内部に、正確な被災者数を自動刻印（0または極小値は非表示にして視覚崩れを防止）
 for p in ax.patches:
     width, height = p.get_width(), p.get_height()
     x, y = p.get_xy() 
-    # 該当ブロックの数値が0、または小さすぎて文字がはみ出る場合はラベルを非表示（視覚の美しさを死守）
     if height > (record_count * 0.015): 
         ax.text(
-            x + width/2,
-            y + height/2,
-            f'{int(height)}',
-            horizontalalignment='center',
-            verticalalignment='center',
-            color='white',
-            fontsize=10,
-            fontweight='bold'
+            x + width/2, y + height/2, f'{int(height)}',
+            horizontalalignment='center', verticalalignment='center',
+            color='white', fontsize=10, fontweight='bold'
         )
 
-plt.title(f"【{condition_str}】死傷労災推移と主要原因の内訳（{TARGET_AXIS_COL} 上位5）", fontsize=15, fontweight='bold')
+# タイトル途切れ防止（pad=20でヘッダー余白を動的確保）
+plt.title(f"【{condition_str}】死傷労災推移と主要原因の内訳（{TARGET_AXIS_COL} 上位5）", fontsize=15, fontweight='bold', pad=20)
 plt.xlabel("発生年", fontsize=11)
 plt.ylabel("死傷者数（人）", fontsize=11)
 plt.legend(title=f'{TARGET_AXIS_COL}', bbox_to_anchor=(1.02, 1), loc='upper left', fontsize=10)
-plt.xticks(rotation=0) # 年の傾きを無くして視覚の水平・垂直を整流化
+plt.xticks(rotation=0) 
 plt.tight_layout()
 
 trend_img = os.path.join(OUTPUT_DIR, f"trend_labeled_{condition_str}_{current_time}.png")
-plt.savefig(trend_img, dpi=300)
+plt.savefig(trend_img, dpi=300, bbox_inches='tight')
 plt.close()
 
 # --- 7. 視覚兵器②：時間軸ヒートマップ（上位10分類） ---
@@ -184,19 +193,20 @@ matrix_data = pd.crosstab(heatmap_df[TARGET_AXIS_COL], heatmap_df['発生時間_
 matrix_data = matrix_data.reindex(columns=time_order, fill_value=0)
 matrix_data = matrix_data.reindex(top_10_causes)
 
-fig, ax = plt.subplots(figsize=(16, 8))
+fig, ax = plt.subplots(figsize=(16, 9)) # 16:9 黄金比キャンバス
 sns.heatmap(matrix_data, annot=True, fmt="d", cmap="Reds", linewidths=.5, cbar_kws={'label': '死傷件数'}, ax=ax)
 
-plt.title(f"【{condition_str}】{TARGET_AXIS_COL} × 発生時間帯の死傷ヒートマップ", fontsize=15, fontweight='bold')
+# タイトル途切れ防止（pad=25 ＆ bbox_inches='tight' の多重防衛）
+plt.title(f"【{condition_str}】{TARGET_AXIS_COL} × 発生時間帯の死傷ヒートマップ", fontsize=15, fontweight='bold', pad=25)
 plt.xlabel("発生時間帯（00時〜23時）", fontsize=11)
 plt.ylabel(f"{TARGET_AXIS_COL}", fontsize=11)
 plt.xticks(rotation=45)
 plt.tight_layout()
 
 heatmap_img = os.path.join(OUTPUT_DIR, f"heatmap_{condition_str}_{current_time}.png")
-plt.savefig(heatmap_img, dpi=300)
+plt.savefig(heatmap_img, dpi=300, bbox_inches='tight')
 plt.close()
 
-print(f"\n[大成功] 進化型ビジュアルアセットが出荷されました。")
-print(f"  └ 推移グラフ（数値ラベル付） : {os.path.abspath(trend_img)}")
-print(f"  └ 死傷ヒートマップ          : {os.path.abspath(heatmap_img)}")
+print(f"\n[大成功] 『事故の型』フィルターが完全連動したアセットが出荷されました。")
+print(f"  └ 推移グラフ（数値ラベル付） : {trend_img}")
+print(f"  └ 死傷ヒートマップ          : {heatmap_img}")
