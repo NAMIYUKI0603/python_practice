@@ -9,7 +9,7 @@ from datetime import datetime
 # --- 1. 空間設計と抽出条件（ここを毎回書き換えて狙い撃つ） ---
 plt.rcParams['font.family'] = 'MS Gothic' # Windows標準フォント
 
-INPUT_CSV = "input/master_sisyou_all_cleaned.csv" 
+INPUT_CSV = "input/master_sibou_all_industries20260326.csv" 
 OUTPUT_DIR = "output_assets"  
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -18,16 +18,16 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # 【業種フィルター】
 TARGET_IND_LARGE  = ["製造業"]                      # 業種_大分類
-TARGET_IND_MEDIUM = ["金属製品製造業"]                              # 業種_中分類
+TARGET_IND_MEDIUM = []                              # 業種_中分類
 TARGET_IND_SMALL  = []                              # 業種_小分類
 
 # 【起因物フィルター】
 TARGET_CAUSE_LARGE  = []                            # 起因物_大分類
-TARGET_CAUSE_MEDIUM = ["金属加工用機械"]            # 起因物_中分類
+TARGET_CAUSE_MEDIUM = []            # 起因物_中分類
 TARGET_CAUSE_SMALL  = []                            # 起因物_小分類
 
 # 【事故の型フィルター】 ★★★ 新規追加の狙撃兵器 ★★★
-TARGET_ACCIDENT_TYPE = []                           # 事故の型（例: ["はさまれ、巻き込まれ", "転倒", "切れ物との接触"]）
+TARGET_ACCIDENT_TYPE = ["はさまれ、巻き込まれ"]                           # 事故の型（例: ["はさまれ、巻き込まれ", "転倒", "切れ物との接触"]）
 
 # 【状況・属性フィルター】
 TARGET_HOURS = []                                   # 発生時間帯（例: ["08時台", "10時台"]）

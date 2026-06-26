@@ -12,12 +12,12 @@ import numpy as np
 from PIL import Image
 
 # --- 1. 空間設計と制御パラメータ ---
-INPUT_TEXT = "input/input_製造業_金属製品製_材料_20260618_1320.txt" 
+INPUT_TEXT = "input/input_製造業_はさまれ_20260626_1057.txt" 
 STOPWORDS_DIR = "stopwords"               
 FONT_PATH = "font/BIZ-UDGothicR.ttc"      
 
 MASK_IMAGE_PATH = "input/mask.png"  
-MAX_WORDS_COUNT = 500               
+MAX_WORDS_COUNT = 200              
 COLOR_MAP = "inferno"                  
 
 timestamp = datetime.now().strftime("%Y%m%d_%H%M")

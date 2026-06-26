@@ -4,7 +4,7 @@ import re
 from datetime import datetime
 
 # --- 1. 空間設計と抽出条件（ここを毎回書き換えて狙い撃つ） ---
-INPUT_CSV = "input/死傷労災_製造業.csv"
+INPUT_CSV = "input/master_sibou_all_industries20260326.csv"
 OUTPUT_DIR = "input"  
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -14,22 +14,25 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # 【業種フィルター】
 TARGET_IND_LARGE  = ["製造業"]                      # 業種_大分類
-TARGET_IND_MEDIUM = ["金属製品製造業"]                              # 業種_中分類（例: ["食料品製造業"]）
-TARGET_IND_SMALL  = []        # 業種_小分類
+TARGET_IND_MEDIUM = []                              # 業種_中分類（例: ["食料品製造業"]）
+TARGET_IND_SMALL  = []                              # 業種_小分類
 
 # 【起因物フィルター】
-TARGET_CAUSE_LARGE  = []                                    # 起因物_大分類
-TARGET_CAUSE_MEDIUM = ["材料"]                                    # 起因物_中分類
-TARGET_CAUSE_SMALL  = []                              # 起因物_小分類
+TARGET_CAUSE_LARGE  = []                            # 起因物_大分類
+TARGET_CAUSE_MEDIUM = []                            # 起因物_中分類
+TARGET_CAUSE_SMALL  = []                            # 起因物_小分類
+
+# 【事故の型フィルター】 ★★★ 新規追加の狙撃兵器 ★★★
+TARGET_ACCIDENT_TYPE = ["はさまれ、巻き込まれ"]     # 事故の型（例: ["はさまれ、巻き込まれ", "墜落、転落"]）
 
 # 【状況・属性フィルター】
 TARGET_HOURS = []                                   # 発生時間帯（例: ["08時台", "10時台"]）
-TARGET_AGE_GROUPS = []    # 年代（例: ["50代", "60代", "70代以上"]）
+TARGET_AGE_GROUPS = []                              # 年代（例: ["50代", "60代", "70代以上"]）
 
 # 出力ファイル名のタイムスタンプ
 current_time = datetime.now().strftime("%Y%m%d_%H%M")
 
-print(f"--- 死傷労災テキスト抽出エンジン（フル階層スナイパー版）起動 [{current_time}] ---")
+print(f"--- 死傷労災テキスト抽出エンジン（事故の型フィルター実装版）起動 [{current_time}] ---")
 
 # --- 2. データ整形ロジック（時間と年代の純化） ---
 def format_time(t_str):
@@ -110,6 +113,12 @@ if TARGET_CAUSE_SMALL:
     filtered_df = filtered_df[filtered_df['起因物_小分類'].isin(TARGET_CAUSE_SMALL)]
     filter_names.append("_".join(TARGET_CAUSE_SMALL))
 
+# 【改修】事故の型フィルターを完全適用
+if TARGET_ACCIDENT_TYPE:
+    filtered_df = filtered_df[filtered_df['事故の型'].isin(TARGET_ACCIDENT_TYPE)]
+    # 出力テキストファイル名が長くなりすぎないよう、指定された事故の型の先頭4文字を動的記録
+    filter_names.append(TARGET_ACCIDENT_TYPE[0][:4])
+
 if TARGET_HOURS:
     filtered_df = filtered_df[filtered_df['発生時間_整形'].isin(TARGET_HOURS)]
     filter_names.append("時間指定")
@@ -121,7 +130,7 @@ if TARGET_AGE_GROUPS and '年代' in filtered_df.columns:
 # 抽出件数の確認
 record_count = len(filtered_df)
 print(f"抽出条件の足跡: {', '.join(filter_names) if filter_names else '全件'}")
-print(f"該当する死傷事故: {record_count} 件")
+print(f"該当する事故データ: {record_count} 件")
 
 if record_count == 0:
     print("[終了] 条件に一致するデータが存在しません。ターゲット設定を見直してください。")
@@ -142,4 +151,4 @@ with open(output_path, 'w', encoding='utf-8') as f:
     f.write(final_text)
 
 print(f"[完了] 抽出テキストを保存しました: {output_path}")
-print("-> 次のステップ：得られたテキストを共起ネットワークに放り込め。")
+print("-> 次のステップ：得られたテキストを共起ネットワークやワードクラウドに放り込め。")
