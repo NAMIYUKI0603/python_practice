@@ -9,7 +9,7 @@ from datetime import datetime
 # --- 1. 空間設計と抽出条件（ここを毎回書き換えて狙い撃つ） ---
 plt.rcParams['font.family'] = 'MS Gothic' # Windows標準フォント
 
-INPUT_CSV = "input/master_sisyou_all_cleaned.csv" 
+INPUT_CSV = "input/死傷労災_製造業.csv" 
 OUTPUT_DIR = "output_assets"  
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -17,13 +17,13 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 # 複数指定したい場合はリスト形式 ["A", "B"] で記述。全件対象の場合は空リスト [] を指定。
 
 # 【業種フィルター】
-TARGET_IND_LARGE  = ["製造業"]                      # 業種_大分類
-TARGET_IND_MEDIUM = ["金属製品製造業"]                              # 業種_中分類
+TARGET_IND_LARGE  = []                      # 業種_大分類
+TARGET_IND_MEDIUM = []                              # 業種_中分類
 TARGET_IND_SMALL  = []                              # 業種_小分類
 
 # 【起因物フィルター】
 TARGET_CAUSE_LARGE  = []                            # 起因物_大分類
-TARGET_CAUSE_MEDIUM = ["金属加工用機械"]            # 起因物_中分類
+TARGET_CAUSE_MEDIUM = []            # 起因物_中分類
 TARGET_CAUSE_SMALL  = []                            # 起因物_小分類
 
 # 【事故の型フィルター】
@@ -32,7 +32,7 @@ TARGET_ACCIDENT_TYPE = []                           # 事故の型（例: ["は�
 # 🔥【最重要：災害状況テキスト・キーワードフィルター】 🔥
 # 災害状況の文章中に、以下のいずれかの単語が含まれているものだけにデータを絞り込んでグラフ化する。
 # 絞り込まない（全件対象）の場合は空リスト [] を指定せよ。
-TARGET_CONTEXT_KEYWORDS = [] # 例: ["清掃", "掃除", "手直し", "スイッチ"]
+TARGET_CONTEXT_KEYWORDS = ["思い込み"] # 例: ["清掃", "掃除", "手直し", "スイッチ"]
 
 # 【状況・属性フィルター】
 TARGET_HOURS = []                                   # 発生時間帯（例: ["08時台", "10時台"]）

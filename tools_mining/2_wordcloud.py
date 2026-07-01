@@ -12,7 +12,7 @@ import numpy as np
 from PIL import Image
 
 # --- 1. 空間設計と制御パラメータ ---
-INPUT_TEXT = "input/input_製造業_はさまれ_20260626_1057.txt" 
+INPUT_TEXT = "input/input_kw_思い込_20260701_1653.txt" 
 STOPWORDS_DIR = "stopwords"               
 FONT_PATH = "font/BIZ-UDGothicR.ttc"      
 
