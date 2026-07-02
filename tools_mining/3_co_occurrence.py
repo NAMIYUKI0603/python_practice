@@ -21,7 +21,7 @@ base_name = os.path.splitext(os.path.basename(INPUT_TEXT))[0]
 OUTPUT_IMAGE = os.path.join(OUTPUT_DIR, f"network_{base_name}_{current_time}.png")
 
 # ★分析の解像度調整パラメータ
-MIN_EDGE_WEIGHT = 10   # 最低何回ペアになったら線を結ぶか
+MIN_EDGE_WEIGHT = 3   # 最低何回ペアになったら線を結ぶか
 MAX_NODES = 30         # 画面に表示する最大単語数
 
 print(f"--- 共起ネットワーク分析エンジン起動 [{current_time}] ---")
