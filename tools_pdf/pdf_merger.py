@@ -6,7 +6,7 @@ import glob
 # ここに結合したいPDF（名前順）を入れる
 INPUT_DIR = "input_merge" 
 # 結合後の完成品の名前
-OUTPUT_FILE = "output/8.1_熱処理現場チェックシート_JP_20260515.pdf" 
+OUTPUT_FILE = "output/SUJ2_D233E_Φ10.5.pdf" 
 
 os.makedirs(INPUT_DIR, exist_ok=True)
 os.makedirs("output", exist_ok=True)
